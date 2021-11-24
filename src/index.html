@@ -12,7 +12,7 @@
 
 
     <div class="grid-container2">
-      <div class="defensiveCR">
+      <div id="defensiveCRDiv">
         <h3>Defensive</h3>
         <table>
           <tr>
@@ -27,7 +27,7 @@
           </tr>
         </table>
       </div>
-      <div class="offensiveCR">
+      <div id="offensiveCRDiv">
         <h3>Offensive</h3>
         <table>
           <tr>
@@ -46,8 +46,85 @@
             <td style="width: 33%;"><input type="checkbox" id="useSave" name="useSave" value="usesSaves"></td>
           </tr>
         </table>
-
       </div>
-
     </div>
+
+    <div class="grid-container2">
+      <div id="sizeDiv">
+        <h3>Size and Health</h3>
+        <table>
+          <tr>
+            <td style="width: 33%;">Size</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;">
+              <select id="size" name="size">
+                <option value="tiny">Tiny</option>
+                <option value="small">Small</option>
+                <option selected value="medium">Medium</option>
+                <option value="large">Large</option>
+                <option value="huge">Huge</option>
+                <option value="gargantuan">Gargantuan</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Hit Dice</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="number" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber" name="diceNumber">d8</span></td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Constitution</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="number" id="constitution" name="constitution" min="1" max="30"></td>
+          </tr>
+        </table>
+      </div>
+      <div id="resistancesDiv">
+        <h3>Vulnerabilities and Resistances</h3>
+        <table>
+          <tr>
+            <td style="width: 33%;">Vulnerabilities</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="checkbox" id="vulnerabilities" name="vulnerabilities" value="vulnerabilities"></td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Resistances/Immunities</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;">
+              <select id="resistances" name="resistances">
+                <option selected value="none">None</option>
+                <option value="resistances">Resistances</option>
+                <option value="immunities">Immunities</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Flies and can deal damage at range (CR 0-9 only)</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="checkbox" id="fliesCanDmgRange" name="fliesCanDmgRange" value="fliesCanDmgRange"></td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Save Proficiencies</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;">
+              <select id="saveProficiencies" name="saveProficiencies">
+                <option selected value="zeroToTwo">0-2</option>
+                <option value="threeToFour">3-4</option>
+                <option value="fiveToSix">5-6</option>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+
+    <div>
+      <h3>Traits</h3>
+      <p>Not an exhaustive list, please see Dungeon Master's Guide for specific instructions on missing one's</p>
+      <p>Generally, for something that just increases dmg, such as Angelic Weapons, increase the monster's effective per-round damage by the amount noted in the trait</p>
+    </div>
+
+  </body> 
+</html>
 

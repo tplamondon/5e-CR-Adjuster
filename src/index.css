@@ -1,11 +1,11 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  /*margin: auto;*/
+  margin: auto;
   /*max-width: 38rem;*/
   padding: 2rem;
 }
 
-
+/* https://coder-coder.com/display-divs-side-by-side/ */
 .grid-container2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
