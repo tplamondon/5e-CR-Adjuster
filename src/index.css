@@ -1,6 +1,41 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  margin: auto;
-  max-width: 38rem;
+  /*margin: auto;*/
+  /*max-width: 38rem;*/
   padding: 2rem;
+}
+
+
+.grid-container2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+}
+
+.grid-container3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 20px;
+}
+
+.grid-container4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 20px;
+}
+
+table.noBorder{
+  border:none;
+}
+
+table.noBorder tr{
+  border:none
+}
+
+table.noBorder tr td{
+  border:none
+}
+
+table.noBorder th{
+  border:none
 }

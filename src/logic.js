@@ -28,3 +28,8 @@ If your monster uses different attack bonuses or save DCs, use the ones that wil
 function calcOffensiveCR(){
     
 }
+
+
+function calcAvgCR(){
+    
+}

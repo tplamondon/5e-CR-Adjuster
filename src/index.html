@@ -7,7 +7,47 @@
     <script defer src="logic.js"> </script>
   </head>
   <body>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
-  </body>
-</html>
+    <h1 style="text-align: center;">CR Adjuster</h1>
+    <p style="text-align: center;">Please input your monsters statistics below</p>
+
+
+    <div class="grid-container2">
+      <div class="defensiveCR">
+        <h3>Defensive</h3>
+        <table>
+          <tr>
+            <td style="width: 33%;">Hit Points</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="number" id="hit-points" name="hit-points" min="1" max="850"></td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Armour Class</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="number" id="AC" name="AC" min="1" max="50"></td>
+          </tr>
+        </table>
+      </div>
+      <div class="offensiveCR">
+        <h3>Offensive</h3>
+        <table>
+          <tr>
+            <td style="width: 33%;">Damage Per Round</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="number" id="damagePerRound" name="damagePerRound" min="0" max="320"></td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Atack Bonus/Save DC</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="number" id="atkBonus" name="atkBonus" min="3" max="14"></td>
+          </tr>
+          <tr>
+            <td style="width: 33%;">Uses Saves?</td>
+            <td style="width: 34%;"></td>
+            <td style="width: 33%;"><input type="checkbox" id="useSave" name="useSave" value="usesSaves"></td>
+          </tr>
+        </table>
+
+      </div>
+
+    </div>
+
