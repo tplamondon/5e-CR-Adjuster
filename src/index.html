@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>DnD CR Adjuster</title>
     <link rel="stylesheet" href="index.css">
-    <script defer src="logic.js"> </script>
+    <script src="logic.js"> </script>
   </head>
   <body>
     <h1 style="text-align: center;">CR Adjuster</h1>
-    <p style="text-align: center;">Please input your monsters statistics below</p>
+    <p style="text-align: center;">Please input your base monsters statistics below</p>
 
 
     <div class="grid-container2">
@@ -18,7 +18,7 @@
           <tr>
             <td style="width: 33%;">Hit Points</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="hit-points" name="hit-points" min="1" max="850"></td>
+            <td style="width: 33%;"><span id="hit-points" name="hit-points">???</span></td>
           </tr>
           <tr>
             <td style="width: 33%;">Armour Class</td>
@@ -57,25 +57,25 @@
             <td style="width: 33%;">Size</td>
             <td style="width: 34%;"></td>
             <td style="width: 33%;">
-              <select id="size" name="size">
-                <option value="tiny">Tiny</option>
-                <option value="small">Small</option>
-                <option selected value="medium">Medium</option>
-                <option value="large">Large</option>
-                <option value="huge">Huge</option>
-                <option value="gargantuan">Gargantuan</option>
+              <select onchange="healthchange()" id="size" name="size">
+                <option value="4">Tiny</option>
+                <option value="6">Small</option>
+                <option selected value="8">Medium</option>
+                <option value="10">Large</option>
+                <option value="12">Huge</option>
+                <option value="20">Gargantuan</option>
               </select>
             </td>
           </tr>
           <tr>
             <td style="width: 33%;">Hit Dice</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber" name="diceNumber">d8</span></td>
+            <td style="width: 33%;"><input type="number" onchange="healthchange()" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber" name="diceNumber">d8</span></td>
           </tr>
           <tr>
             <td style="width: 33%;">Constitution</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="constitution" name="constitution" min="1" max="30"></td>
+            <td style="width: 33%;"><input type="number" onchange="healthchange()" id="constitution" name="constitution" min="1" max="30"></td>
           </tr>
         </table>
       </div>
@@ -123,6 +123,46 @@
       <h3>Traits</h3>
       <p>Not an exhaustive list, please see Dungeon Master's Guide for specific instructions on missing one's</p>
       <p>Generally, for something that just increases dmg, such as Angelic Weapons, increase the monster's effective per-round damage by the amount noted in the trait</p>
+      <p>For Traits that increase AC or Attack Bonus, fill in the above chart with those traits in mind. They're probably not listed below</p>
+
+      <table class="multiColour">
+        <tr>
+          <th>Has?</th>
+          <th>Name</th>
+          <th>Example Monster</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td><input type="checkbox" id="DamageTransfer" name="DamageTransfer" value="DamageTransfer"></td>
+          <td>Damage Transfer</td>
+          <td>Cloaker</td>
+          <td>Double the monster's effective hit points. Add one-third of the monster's hit points to its per-round damage</td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" id="FrightfulPresence" name="FrightfulPresence" value="FrightfulPresence"></td>
+          <td>Frightful Presence</td>
+          <td>Ancient black dragon</td>
+          <td>Increase the monster's effective hit points by 25% if the monster is meant to face characters of 10th level or lower (Check only if meant to face characters 10th level or lower, ignore otherwise)</td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" id="FrightfulPresence" name="FrightfulPresence" value="FrightfulPresence"></td>
+          <td>Horrifying Visage</td>
+          <td>Banshee</td>
+          <td>Increase the monster's effective hit points by 25% if the monster is meant to face characters of 10th level or lower (Check only if meant to face characters 10th level or lower, ignore otherwise)</td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" id="Possession" name="Possession" value="Possession"></td>
+          <td>Possession</td>
+          <td>Ghost</td>
+          <td>Double the monster's effective hit points</td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <h3>Calculate Current CR</h3>
+      <button type="button" onclick="calcAvgCR()">Calculate</button>
+      <p>The current Challenge Rating of the monster is estimated to be: <span id="avgCR">?</span></p>
     </div>
 
   </body> 
