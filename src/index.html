@@ -41,12 +41,12 @@
           <tr>
             <td style="width: 33%;">Atack Bonus/Save DC</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="atkBonus" name="atkBonus" min="3" max="14"></td>
+            <td style="width: 33%;"><input type="number" id="atkBonus" name="atkBonus" min="-5" max="50"></td>
           </tr>
           <tr>
             <td style="width: 33%;">Uses Saves?</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="checkbox" id="useSave" name="useSave" value="usesSaves"></td>
+            <td style="width: 33%;"><input type="checkbox" id="useSave" name="useSave"></td>
           </tr>
         </table>
       </div>
@@ -165,8 +165,10 @@
     <div>
       <h3>Calculate Current CR</h3>
       <button type="button" onclick="calcAvgCR()">Calculate</button>
-      <span class="error" id="errormsg"></span>
+      <p></p><span class="error" id="errormsg"></span></p>
+      <p><span class="error" id="errormsg2"></span></p>
       <p>The current Defensive Challenge Rating of the monster is estimated to be: <span id="defCR">?</span></p>
+      <p>The current Offensive Challenge Rating of the monster is estimated to be: <span id="offCR">?</span></p>
       <p>The current Challenge Rating of the monster is estimated to be: <span id="avgCR">?</span></p>
 
     </div>

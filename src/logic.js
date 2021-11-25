@@ -67,7 +67,8 @@ function calcDefensiveCR(){
     if(defCR == 0 && ac <= ACarray[0]){
         return defCR;
     }
-    defCR = defCR + (Math.floor(difac/2))
+    let changeCR = (Math.floor(difac/2));
+    defCR = getCRWithDifference(index, changeCR);
     //TODO: deal with this situation where defensive CR is less than 0
     if(defCR < 0){
         document.getElementById("errormsg").innerHTML = "ERROR: defensive CR < 0, error's may be present with final CR"; 
@@ -89,6 +90,94 @@ If your monster uses different attack bonuses or save DCs, use the ones that wil
 */
 function calcOffensiveCR(){
     
+    document.getElementById("errormsg2").innerHTML = ""; 
+    if(document.getElementById("damagePerRound").value.length == 0){
+        document.getElementById("errormsg").innerHTML = "ERROR: damage per round not set"; 
+        return -1;
+    }
+    if(document.getElementById("atkBonus").value.length == 0){
+        document.getElementById("errormsg").innerHTML = "ERROR: attack bonus not set"; 
+        return -1;
+    }
+    if(document.getElementById("damagePerRound").value < 0 || document.getElementById("damagePerRound").value > 320){
+        document.getElementById("errormsg").innerHTML = "ERROR: damage must be between 0 and 320"; 
+        return -1;
+    }
+    if(document.getElementById("atkBonus").value < -5){
+        document.getElementById("errormsg").innerHTML = "ERROR: attack bonus/save DC must be between -5 and 50"; 
+        return -1;
+    }
+    var offcr = -1;
+    let damagePerRound = document.getElementById("damagePerRound").value;
+    let atkBonus = document.getElementById("atkBonus").value;
+    let useSave = document.getElementById("useSave").checked; //true if checked, false otherwise
+    //get offensive CR from dmg
+    var index = -1;
+        for(index = 0; index<dmgarray.length; index++){
+            if(damagePerRound <= dmgarray[index]){
+                offcr = CRarray[index];
+                break;
+            }
+        }
+        //check if we actually got a valid CR from dmg
+        if(offcr < 0){
+            //ERROR
+            console.log("index: "+index)
+            document.getElementById("errormsg2").innerHTML = "ERROR: Not a valid damage amount, please check DMG table for allowed minimum and maximum damage values"; 
+            return -1;
+        }
+    //if not using saves
+    if(useSave == false){
+        //calculate proper atkbonus for dmg cr
+        let crATK = atkarray[index];
+        //adjust by 1 offensive CR for every 2 points above or below (if atkbonus > crATK, we'll get positive number)
+        let difatk = atkBonus - crATK;
+        if(offcr == 0 && atkBonus <= atkarray[0]){
+            return offcr;
+        }
+        let changeCR = (Math.floor(difatk/2));
+        offcr = getCRWithDifference(index, changeCR);
+        //TODO: deal with this situation where defensive CR is less than 0
+        if(offcr < 0){
+            document.getElementById("errormsg2").innerHTML = "ERROR: offensive CR < 0, error's may be present with final CR"; 
+        }
+        return offcr;
+    }
+    //if using saves
+    else{
+        //calculate proper save bonus
+        //in this case, atkBonus = saveDC
+        let crSave = savearray[index];
+        //adjust by 1 offensive CR for every 2 points above or below (if saveDC > crSave, we'll get positive number)
+        let difatk = atkBonus - crSave;
+        if(offcr == 0 && atkBonus <= savearray[0]){
+            return offcr;
+        }
+        let changeCR = (Math.floor(difatk/2));
+        offcr = getCRWithDifference(index, changeCR);
+        //TODO: deal with this situation where defensive CR is less than 0
+        if(offcr < 0){
+            document.getElementById("errormsg2").innerHTML = "ERROR: offensive CR < 0, error's may be present with final CR"; 
+        }
+        return offcr;
+    }
+    //this shouldn't run, if it does, something went wrong
+    console.log("calcOffensiveCR() failed to return a proper offensive CR")
+    return -1;
+}
+
+/**
+ * Get's the difference between base CR and the adjustment
+ * @param {*} index 
+ * @param {*} difference 
+ */
+function getCRWithDifference(index, difference){
+    let newArrayPos = index+difference;
+    if(newArrayPos < 0 || newArrayPos > CRarray.length){
+        return -100;
+    }
+    return CRarray[index+difference];
+
 }
 
 function healthchange(){
@@ -123,19 +212,76 @@ function calcConstModifier(){
     return constmodifier
 }
 
+
+function lookupIndexByCR(cr){
+    var i = 0;
+    for(i=0; i<CRarray.length; i++){
+        if(cr == CRarray[i]){
+            return i;
+        }
+    }
+    //else we didn't get anything
+    console.log("Failed to lookup index of given CR")
+    return -1;
+}
+
 function calcAvgCR(){
+    //get defensive cr
     let defCR = calcDefensiveCR();
-    console.log("defCR = "+defCR)
-    var defCRstr = defCR;
-    if(defCR == 0.125){
-        defCRstr = "1/8"
+    if(defCR >= 0 && defCR < 30){
+        var defCRstr = defCR;
+        if(defCR == 0.125){
+            defCRstr = "1/8"
+        }
+        else if(defCR == 0.25){
+            defCRstr = "1/4"
+        }
+        else if(defCR == 0.5){
+            defCRstr = "1/2"
+        }
+        document.getElementById("defCR").innerHTML = defCRstr;
     }
-    else if(defCR == 0.25){
-        defCRstr = "1/4"
+    //if CR was out of bounds
+    else{
+        document.getElementById("errormsg").innerHTML = "ERROR: defensive cr ended up being less than 0 or greater than 30";
+        document.getElementById("defCR").innerHTML = "?";
+        document.getElementById("avgCR").innerHTML = "?";
     }
-    else if(defCR == 0.5){
-        defCRstr = "1/2"
+    //get offensive cr
+    let offCR = calcOffensiveCR();
+    if(offCR >=0 && offCR < 30){
+        var offCRstr = offCR;
+        if(offCR == 0.125){
+            offCRstr = "1/8"
+        }
+        else if(offCR == 0.25){
+            offCRstr = "1/4"
+        }
+        else if(offCR == 0.5){
+            offCRstr = "1/2"
+        }
+        document.getElementById("offCR").innerHTML = offCRstr;
     }
-    document.getElementById("defCR").innerHTML = defCRstr;
-    document.getElementById("avgCR").innerHTML = "2";
+    else{
+        document.getElementById("errormsg2").innerHTML = "ERROR: offensive cr ended up being less than 0 or greater than 30";
+        document.getElementById("offCR").innerHTML = "?";
+        document.getElementById("avgCR").innerHTML = "?";
+    }
+    
+    //get average cr
+    let defCRindex = lookupIndexByCR(defCR);
+    let offCRindex = lookupIndexByCR(offCR);
+    let avgCRindex = Math.round((defCRindex + offCRindex) / 2)
+    let avgCR = CRarray[avgCRindex];
+    var avgCRstr = avgCR;
+    if(avgCR == 0.125){
+        avgCRstr = "1/8"
+    }
+    else if(avgCR == 0.25){
+        avgCRstr = "1/4"
+    }
+    else if(avgCR == 0.5){
+        avgCRstr = "1/2"
+    }
+    document.getElementById("avgCR").innerHTML = avgCRstr;
 }
