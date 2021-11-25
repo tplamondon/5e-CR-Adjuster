@@ -18,12 +18,15 @@
           <tr>
             <td style="width: 33%;">Hit Points</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><span id="hit-points" name="hit-points">???</span></td>
+            <td style="width: 33%;">
+              <input type="hidden" id="hit-points-value" name="hit-points-value" value="-1"> 
+              <span id="hit-points" name="hit-points">???</span>
+            </td>
           </tr>
           <tr>
             <td style="width: 33%;">Armour Class</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="AC" name="AC" min="1" max="50"></td>
+            <td style="width: 33%;"><input type="number" id="ac" name="ac" min="1" max="50"></td>
           </tr>
         </table>
       </div>
@@ -162,7 +165,10 @@
     <div>
       <h3>Calculate Current CR</h3>
       <button type="button" onclick="calcAvgCR()">Calculate</button>
+      <span class="error" id="errormsg"></span>
+      <p>The current Defensive Challenge Rating of the monster is estimated to be: <span id="defCR">?</span></p>
       <p>The current Challenge Rating of the monster is estimated to be: <span id="avgCR">?</span></p>
+
     </div>
 
   </body> 

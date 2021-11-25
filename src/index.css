@@ -58,3 +58,7 @@ table.multiColour td, table.multiColour th {
 table.multiColour tr:nth-child(even) {
   background-color: #dddddd;
 }
+
+span.error {
+  color:red;
+}

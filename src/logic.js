@@ -31,22 +31,48 @@ Now look at the Armor Class suggested for a monster of that challenge rating. If
 or lower than that number, adjust the challenge rating suggested by its hit points up or down by 1 for every 2 points of difference.
 */
 function calcDefensiveCR(){
-    let defCR = -1;
+    document.getElementById("errormsg").innerHTML = ""; 
+    if(document.getElementById("ac").value.length == 0){
+        document.getElementById("errormsg").innerHTML = "ERROR: no armour-class value set"; 
+        return -1;
+    }
+    var defCR = -1;
     //get required values
-    var inputHP = document.getElementById("hit-points").value; 
+    let inputHP = document.getElementById("hit-points-value").value; 
+    let ac = document.getElementById("ac").value; 
+    //display error
+    if(inputHP == "???" || inputHP < 1){
+        document.getElementById("errormsg").innerHTML = "ERROR: monster has valid no HP set"; 
+        return -1;
+    }
     //find HP
-    let index = 0;
+    var index = 0;
     for(index=0; index<hpArray.length; index++){
         if(inputHP <= hpArray[index]){
             defCR = CRarray[index];
+            break;
         }
     }
-    //check if we actually got a valid CR
-    if(cr < 0){
+    //check if we actually got a valid CR from HP
+    if(defCR < 0){
         //ERROR
+        console.log("index: "+index)
+        document.getElementById("errormsg").innerHTML = "ERROR: Not a valid HP amount, please check DMG table for allowed minimum and maximum HP values"; 
         return -1;
     }
-
+    //calculate proper AC
+    let crAC = ACarray[index];
+    //adjust by 1 def CR for every 2 points above or below (if ac > crAC, we'll get positive number)
+    let difac = ac - crAC;
+    if(defCR == 0 && ac <= ACarray[0]){
+        return defCR;
+    }
+    defCR = defCR + (Math.floor(difac/2))
+    //TODO: deal with this situation where defensive CR is less than 0
+    if(defCR < 0){
+        document.getElementById("errormsg").innerHTML = "ERROR: defensive CR < 0, error's may be present with final CR"; 
+    }
+    return defCR;
 }
 
 
@@ -84,6 +110,7 @@ function healthchange(){
     let hitdiceamount = document.getElementById("hitdice").value;
     let hp = Math.floor(((size/2) + 0.5)*hitdiceamount + constmodifier*hitdiceamount);
     document.getElementById("hit-points").innerHTML = hp;
+    document.getElementById("hit-points-value").value = hp;
     return;
 }
 
@@ -97,6 +124,18 @@ function calcConstModifier(){
 }
 
 function calcAvgCR(){
-
+    let defCR = calcDefensiveCR();
+    console.log("defCR = "+defCR)
+    var defCRstr = defCR;
+    if(defCR == 0.125){
+        defCRstr = "1/8"
+    }
+    else if(defCR == 0.25){
+        defCRstr = "1/4"
+    }
+    else if(defCR == 0.5){
+        defCRstr = "1/2"
+    }
+    document.getElementById("defCR").innerHTML = defCRstr;
     document.getElementById("avgCR").innerHTML = "2";
 }
