@@ -1,5 +1,5 @@
 /*
-    Global Variables
+ *   Global Variables
 */
 
 /*
@@ -240,12 +240,15 @@ function calcAvgCR(){
             defCRstr = "1/2"
         }
         document.getElementById("defCR").innerHTML = defCRstr;
+        document.getElementById("defenceCRAvg").value = defCRstr;
     }
     //if CR was out of bounds
     else{
         document.getElementById("errormsg").innerHTML = "ERROR: defensive cr ended up being less than 0 or greater than 30";
         document.getElementById("defCR").innerHTML = "?";
         document.getElementById("avgCR").innerHTML = "?";
+        document.getElementById("defenceCRAvg").value = -1;
+        document.getElementById("CRAverage").value = -1;
     }
     //get offensive cr
     let offCR = calcOffensiveCR();
@@ -261,11 +264,14 @@ function calcAvgCR(){
             offCRstr = "1/2"
         }
         document.getElementById("offCR").innerHTML = offCRstr;
+        document.getElementById("offenceCRAvg").value = offCRstr;
     }
     else{
         document.getElementById("errormsg2").innerHTML = "ERROR: offensive cr ended up being less than 0 or greater than 30";
         document.getElementById("offCR").innerHTML = "?";
         document.getElementById("avgCR").innerHTML = "?";
+        document.getElementById("offenceCRAvg").value = -1;
+        document.getElementById("CRAverage").value = -1;
     }
     
     //get average cr
@@ -284,4 +290,34 @@ function calcAvgCR(){
         avgCRstr = "1/2"
     }
     document.getElementById("avgCR").innerHTML = avgCRstr;
+    document.getElementById("CRAverage").value = defCRstr;
+    updateSliderLabel(lookupIndexByCR(avgCR));
+}
+
+
+
+/*
+ !   Adjust CR Functions
+*/
+
+function updateSliderLabel(cr){
+    document.getElementById("crScale").value = cr;
+    changeSliderLabel();
+}
+
+function changeSliderLabel(){
+    let crslider = document.getElementById("crScale");
+    let crScaleText = document.getElementById("crScaleText");
+    let cr = CRarray[crslider.value]
+    var crStr = cr;
+    if(cr == 0.125){
+        crStr = "1/8"
+    }
+    else if(cr == 0.25){
+        crStr = "1/4"
+    }
+    else if(cr == 0.5){
+        crStr = "1/2"
+    }
+    crScaleText.innerHTML = crStr;
 }
