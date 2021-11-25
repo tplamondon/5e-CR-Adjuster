@@ -10,6 +10,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 20px;
+  padding-left: 10%;
+  padding-right: 10%;
 }
 
 .grid-container3 {
@@ -37,8 +39,25 @@ table.noBorder tr td{
   border:none
 }
 
-table.noBorder th{
+table.noBorder tr th{
   border:none
+}
+
+/* Equal Width 3 */
+table.threeSpaced{
+  width:80%;
+}
+
+table.threeSpaced tr{
+  width:100%;
+}
+
+table.threeSpaced tr td{
+  width:33%.3;
+}
+
+table.threeSpaced tr th{
+  width:33.3%;
 }
 
 /* Alternating Colour Tables */
