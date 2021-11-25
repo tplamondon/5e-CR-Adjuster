@@ -38,13 +38,20 @@ function calcDefensiveCR(){
     }
     var defCR = -1;
     //get required values
-    let inputHP = document.getElementById("hit-points-value").value; 
+    let vulnerable = document.getElementById("vulnerabilities").checked;
+    var hpMultiplier = 1;
+    if(vulnerable == true){
+        hpMultiplier = 0.5;
+    }
+    var inputHP = document.getElementById("hit-points-value").value; 
     let ac = document.getElementById("ac").value; 
     //display error
     if(inputHP == "???" || inputHP < 1){
         document.getElementById("errormsg").innerHTML = "ERROR: monster has valid no HP set"; 
         return -1;
     }
+    //adjust effective HP
+    inputHP *= hpMultiplier;
     //find HP
     var index = 0;
     for(index=0; index<hpArray.length; index++){
@@ -290,8 +297,13 @@ function calcAvgCR(){
         avgCRstr = "1/2"
     }
     document.getElementById("avgCR").innerHTML = avgCRstr;
-    document.getElementById("CRAverage").value = defCRstr;
+    document.getElementById("CRAverage").value = avgCRstr;
     updateSliderLabel(lookupIndexByCR(avgCR));
+
+    //TODO Calculate new CR based on vulnerabilities, and stuff now that we have the average CR
+    //vulerabilities, reduce effective HP by 1/2
+
+
 }
 
 

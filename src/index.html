@@ -19,7 +19,7 @@
             <td style="width: 34%;"></td>
             <td style="width: 33%;">
               <input type="hidden" id="hit-points-value" name="hit-points-value" value="-1"> 
-              <span id="hit-points" name="hit-points">???</span>
+              <span id="hit-points">???</span>
             </td>
           </tr>
           <tr>
@@ -72,7 +72,7 @@
           <tr>
             <td style="width: 33%;">Hit Dice</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" onchange="healthchange()" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber" name="diceNumber">d8</span></td>
+            <td style="width: 33%;"><input type="number" onchange="healthchange()" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber">d8</span></td>
           </tr>
           <tr>
             <td style="width: 33%;">Constitution</td>
@@ -168,7 +168,7 @@
     <div>
       <h3>Calculate Current CR</h3>
       <button type="button" onclick="calcAvgCR()">Calculate</button>
-      <p></p><span class="error" id="errormsg"></span></p>
+      <p><span class="error" id="errormsg"></span></p>
       <p><span class="error" id="errormsg2"></span></p>
       <p>The current Defensive Challenge Rating of the monster is estimated to be: <span id="defCR">?</span></p>
       <p>The current Offensive Challenge Rating of the monster is estimated to be: <span id="offCR">?</span></p>
