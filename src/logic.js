@@ -82,7 +82,7 @@ function healthchange(){
     }
     let constmodifier = calcConstModifier();
     let hitdiceamount = document.getElementById("hitdice").value;
-    let hp = size*hitdiceamount + constmodifier*hitdiceamount;
+    let hp = Math.floor(((size/2) + 0.5)*hitdiceamount + constmodifier*hitdiceamount);
     document.getElementById("hit-points").innerHTML = hp;
     return;
 }
