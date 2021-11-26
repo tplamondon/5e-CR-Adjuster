@@ -88,10 +88,6 @@ function calcDefensiveCR(multiplier){
     }
     let changeCR = (Math.floor(difac/2));
     defCR = getCRWithDifference(index, changeCR);
-    //TODO: deal with this situation where defensive CR is less than 0
-    if(defCR < 0){
-        document.getElementById("errormsg").innerHTML = "ERROR: defensive CR < 0, error's may be present with final CR"; 
-    }
     return defCR;
 }
 
@@ -155,10 +151,6 @@ function calcOffensiveCR(){
         }
         let changeCR = (Math.floor(difatk/2));
         offcr = getCRWithDifference(index, changeCR);
-        //TODO: deal with this situation where defensive CR is less than 0
-        if(offcr < 0){
-            document.getElementById("errormsg2").innerHTML = "ERROR: offensive CR < 0, error's may be present with final CR"; 
-        }
         return offcr;
     }
     //if using saves
@@ -173,10 +165,6 @@ function calcOffensiveCR(){
         }
         let changeCR = (Math.floor(difatk/2));
         offcr = getCRWithDifference(index, changeCR);
-        //TODO: deal with this situation where defensive CR is less than 0
-        if(offcr < 0){
-            document.getElementById("errormsg2").innerHTML = "ERROR: offensive CR < 0, error's may be present with final CR"; 
-        }
         return offcr;
     }
     //this shouldn't run, if it does, something went wrong
@@ -248,9 +236,6 @@ function calcAvgCR(){
     document.getElementById("avgCR").innerHTML = avgCRstr;
     document.getElementById("CRAverage").value = avgCRstr;
     updateSliderLabel(lookupIndexByCR(avgCR));
-
-    //TODO Calculate new CR based on vulnerabilities, and stuff now that we have the average CR
-    //vulerabilities, reduce effective HP by 1/2
 }
 
 
@@ -502,7 +487,22 @@ function changeSliderLabel(){
 
 function adjustCR(){
     //get value to adjust to
-    let crIndex = document.getElementById("crScale").value;
+    let newCRIndex = document.getElementById("crScale").value;
+    //get the CR's as strings such as "0", "1/4", ...
+    let defCRStr = document.getElementById("defenceCRAvg").value;
+    let offCRStr = document.getElementById("offenceCRAvg").value;
+    let avgCRStr = document.getElementById("CRAverage").value;
+    //get index of CR's
+    let defCRIndex = CRStrarray.indexOf(defCRStr);
+    let offCRIndex = CRStrarray.indexOf(offCRStr);
+    let avgCRIndex = CRStrarray.indexOf(avgCRStr);
+    //get scale amount
+    let scaleIndex = newCRIndex - avgCRIndex;
+    //get scale amount for def and offence
+    let defCRScaleIndex = defCRIndex + scaleIndex;
+    let offCRScaleIndex = offCRIndex + scaleIndex;
+    // TODO deal with situation where the scale ends up below CR 0 or above CR 30
+
 
 }
 
