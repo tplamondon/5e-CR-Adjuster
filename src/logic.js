@@ -485,6 +485,75 @@ function changeSliderLabel(){
 //--------------------------------------------------------------------------------------//
 
 
+/**
+ * 
+ * @param {*} CR The CR string
+ * @returns AC bonus
+ */
+ function getFlyACBonusVariable(CR){
+    let saveAmount = document.getElementById("fliesCanDmgRange").checked;
+    var acBonus = 0;
+    if(saveAmount == true){
+        let expectedCRStr = cr;
+        //if cr string isn't in returns -1, otherwise returns index of it
+        let crIndex = CRStrarray.indexOf(expectedCRStr);
+        //get multplier for resistances/immunities based on expected CR, will be 1 if no resistances or immunities
+        let expectedCR = CRarray[crIndex];
+        if(expectedCR < 10){
+            acBonus = 2;
+        }
+    }
+    return acBonus;
+}
+
+/**
+ * 
+ * @param {*} hp 
+ * @returns index of HP amount, -1 otherwise
+ */
+function getHPAmount(hp){
+    var index = 0;
+    for(index=0; index<hpArray.length; index++){
+        if(hp<hpArray[index]){
+            return index;
+        }
+    }
+    return -1;
+}
+function getACAmount(ac){
+    var index = 0;
+    for(index=0; index<ACarray.length; index++){
+        if(ac==ACarray[index]){
+            return index;
+        }
+    }
+    return -1;
+}
+
+function getDMGAmount(dmg){
+    var index = 0;
+    for(index=0; index<dmgarray.length; index++){
+        if(dmg<dmgarray[index]){
+            return index;
+        }
+    }
+    return -1;
+}
+
+function getATKBonusAmount(atkBonus){
+    var index = 0;
+    for(index=0; index<atkarray.length; index++){
+        if(atkBonus==atkarray[index]){
+            return index;
+        }
+    }
+    return -1;
+}
+
+function getEffectiveHP(HP, cr){
+    let multiplier = getMultiplierForResistances(cr)
+}
+
 function adjustCR(){
     //get value to adjust to
     let newCRIndex = document.getElementById("crScale").value;
@@ -498,10 +567,22 @@ function adjustCR(){
     let avgCRIndex = CRStrarray.indexOf(avgCRStr);
     //get scale amount
     let scaleIndex = newCRIndex - avgCRIndex;
-    //get scale amount for def and offence
-    let defCRScaleIndex = defCRIndex + scaleIndex;
-    let offCRScaleIndex = offCRIndex + scaleIndex;
-    // TODO deal with situation where the scale ends up below CR 0 or above CR 30
+    //! get effective values
+    //get effective HP
+    let effectiveHP = getEffectiveHP(document.getElementById("hit-points-value").value, document.getElementById("CRAverage").value);
+    //get added AC
+    let addedAC = getSaveThrowACBonus() + getFlyACBonusVariable(avgCRStr);
+    //get effective AC
+    let effectiveAC = parseInt(addedAC) + parseInt(document.getElementById("ac").value);
+
+
+    //TODO maybe not do this?
+    //get indexes of def stuff before scaling
+    var hpIndexBeforeScale = getHPAmount(document.getElementById("hit-points-value").value)
+    var acIndexBeforeScale = getACAmount(document.getElementById("ac").value)//TODO do we need this?
+    //get index of off stuff before scaling
+    var dmgIndexBeforeScale = getDMGAmount(document.getElementById("damagePerRound").value)
+    var atkBonusIndexBeforeScale = getATKBonusAmount(document.getElementById("atkBonus").value)//TODO do we need this?
 
 
 }
