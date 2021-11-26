@@ -1,12 +1,17 @@
-/*
- *   Global Variables
-*/
+
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                                   Global Variables                                   //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
+
 
 /*
     0, 1/8, 1/4, 1/2, 1...
     CR's are X-3 where x is array index past first 4 (index > 3)
  */
 const CRarray = [0, 0.125, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7 ,8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+const CRStrarray = ["0", "1/8", "1/4", "1/2", "1", "2", "3", "4", "5", "6", "7" ,"8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"]
 const hpArray = [6, 35, 49, 70, 85, 100, 115, 130, 145, 160, 175, 190, 205, 220, 235, 250, 265, 280, 295, 310, 325, 340, 355, 400, 445, 490, 535, 580, 625, 670, 715, 760, 805, 850]
 /* AC can be <=13 for CR 0 */
 const ACarray = [13, 13, 13, 13, 13, 13, 13, 14, 15, 15, 15, 16, 16, 17, 17, 17, 18, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19]
@@ -22,6 +27,14 @@ function validateArraySizes(){
     alert(msg)
 }
 
+
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                      Calculation of Defensive and Offensive CR                       //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
+
+
 //based on HP and AC
 /*
 Read down the Hit Points column of the Monster Statistics by Challenge Rating table until you find your monster's hit points. 
@@ -30,7 +43,7 @@ Then look across and note the challenge rating suggested for a monster with thos
 Now look at the Armor Class suggested for a monster of that challenge rating. If your monster's AC is at least two points higher 
 or lower than that number, adjust the challenge rating suggested by its hit points up or down by 1 for every 2 points of difference.
 */
-function calcDefensiveCR(){
+function calcDefensiveCR(multiplier){
     document.getElementById("errormsg").innerHTML = ""; 
     if(document.getElementById("ac").value.length == 0){
         document.getElementById("errormsg").innerHTML = "ERROR: no armour-class value set"; 
@@ -44,14 +57,14 @@ function calcDefensiveCR(){
         hpMultiplier = 0.5;
     }
     var inputHP = document.getElementById("hit-points-value").value; 
-    let ac = document.getElementById("ac").value; 
+    let ac = parseInt(document.getElementById("ac").value) + parseInt(getSaveThrowACBonus()); 
     //display error
     if(inputHP == "???" || inputHP < 1){
         document.getElementById("errormsg").innerHTML = "ERROR: monster has valid no HP set"; 
         return -1;
     }
     //adjust effective HP
-    inputHP *= hpMultiplier;
+    inputHP = inputHP * hpMultiplier * multiplier;
     //find HP
     var index = 0;
     for(index=0; index<hpArray.length; index++){
@@ -63,7 +76,6 @@ function calcDefensiveCR(){
     //check if we actually got a valid CR from HP
     if(defCR < 0){
         //ERROR
-        console.log("index: "+index)
         document.getElementById("errormsg").innerHTML = "ERROR: Not a valid HP amount, please check DMG table for allowed minimum and maximum HP values"; 
         return -1;
     }
@@ -129,7 +141,6 @@ function calcOffensiveCR(){
         //check if we actually got a valid CR from dmg
         if(offcr < 0){
             //ERROR
-            console.log("index: "+index)
             document.getElementById("errormsg2").innerHTML = "ERROR: Not a valid damage amount, please check DMG table for allowed minimum and maximum damage values"; 
             return -1;
         }
@@ -173,6 +184,165 @@ function calcOffensiveCR(){
     return -1;
 }
 
+
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                                 Calculate Average CR                                 //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
+
+
+function calcAvgCR(){
+    //get expected CR
+    if(document.getElementById("expectedCR").value.length == 0){
+        document.getElementById("errormsg").innerHTML = "ERROR: no expected CR set";
+        return -1;
+    }
+    let expectedCRStr = document.getElementById("expectedCR").value;
+    //if cr string isn't in returns -1, otherwise returns index of it
+    let crIndex = CRStrarray.indexOf(expectedCRStr);
+    if(crIndex == -1){
+        document.getElementById("errormsg").innerHTML = "ERROR: not valid expected cr";
+        return -1;
+    }
+    //get multplier for resistances/immunities based on expected CR, will be 1 if no resistances or immunities
+    let expectedCR = CRarray[crIndex];
+    let multiplier = getMultiplierForResistances(expectedCR);
+    //get defensive cr
+    let defCR = calcDefensiveCR(multiplier);
+    if(defCR >= 0 && defCR < 30){
+        var defCRstr = defCR;
+        getCRString(defCR)
+        document.getElementById("defCR").innerHTML = defCRstr;
+        document.getElementById("defenceCRAvg").value = defCRstr;
+    }
+    //if CR was out of bounds
+    else{
+        document.getElementById("errormsg").innerHTML = "ERROR: defensive cr ended up being less than 0 or greater than 30";
+        document.getElementById("defCR").innerHTML = "?";
+        document.getElementById("avgCR").innerHTML = "?";
+        document.getElementById("defenceCRAvg").value = -1;
+        document.getElementById("CRAverage").value = -1;
+    }
+    //get offensive cr
+    let offCR = calcOffensiveCR();
+    if(offCR >=0 && offCR < 30){
+        var offCRstr = getCRString(offCR)
+        document.getElementById("offCR").innerHTML = offCRstr;
+        document.getElementById("offenceCRAvg").value = offCRstr;
+    }
+    else{
+        document.getElementById("errormsg2").innerHTML = "ERROR: offensive cr ended up being less than 0 or greater than 30";
+        document.getElementById("offCR").innerHTML = "?";
+        document.getElementById("avgCR").innerHTML = "?";
+        document.getElementById("offenceCRAvg").value = -1;
+        document.getElementById("CRAverage").value = -1;
+    }
+    
+    //get average cr
+    let defCRindex = lookupIndexByCR(defCR);
+    let offCRindex = lookupIndexByCR(offCR);
+    let avgCRindex = Math.round((defCRindex + offCRindex) / 2)
+    let avgCR = CRarray[avgCRindex];
+    var avgCRstr = getCRString(avgCR)
+    document.getElementById("avgCR").innerHTML = avgCRstr;
+    document.getElementById("CRAverage").value = avgCRstr;
+    updateSliderLabel(lookupIndexByCR(avgCR));
+
+    //TODO Calculate new CR based on vulnerabilities, and stuff now that we have the average CR
+    //vulerabilities, reduce effective HP by 1/2
+}
+
+
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                         Helper Functions for CR Calculation                          //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
+
+
+/**
+ * 
+ * @returns AC bonus based on number of save proficiencies based on DMG
+ */
+function getSaveThrowACBonus(){
+    let saveAmount = document.getElementById("saveProficiencies").value;
+    if(saveAmount == "zeroToTwo"){
+        return 0;
+    }
+    else if(saveAmount == "threeToFour"){
+        return 2;
+    }
+    else{
+        return 4;
+    }
+}
+
+/**
+ * 
+ * @param {*} expectedCR 
+ * @returns multiplier
+ */
+function getMultiplierForResistances(expectedCR){
+    let resistanceType = document.getElementById("resistances").value;
+    if(resistanceType == "none"){
+        return 1;
+    }
+    else if(resistanceType == "resistances"){
+        if(expectedCR >= 1 && expectedCR <= 4){
+            return 2;
+        }
+        else if(expectedCR >= 5 && expectedCR <= 10){
+            return 1.5;
+        }
+        else if(expectedCR >= 11 && expectedCR <= 16){
+            return 1.25;
+        }
+        else{
+            return 1;
+        }
+    }
+    else if(resistanceType == "immunities"){
+        if(expectedCR >= 1 && expectedCR <= 4){
+            return 2;
+        }
+        else if(expectedCR >= 5 && expectedCR <= 10){
+            return 2;
+        }
+        else if(expectedCR >= 11 && expectedCR <= 16){
+            return 1.5;
+        }
+        else{
+            return 1.25;
+        }
+    }
+    else{
+        //shouldn't come here
+        console.log("Error in getMultiplierForResistances(expectedCR), couldn't find resistance type")
+        return -1;
+    }
+}
+
+
+/**
+ * 
+ * @param {*} cr 
+ * @returns CR string
+ */
+function getCRString(cr){
+    var str = cr;
+    if(cr == 0.125){
+        str = "1/8"
+    }
+    else if(defCR == 0.25){
+        str = "1/4"
+    }
+    else if(defCR == 0.5){
+        str = "1/2"
+    }
+    return str;
+}
+
 /**
  * Get's the difference between base CR and the adjustment
  * @param {*} index 
@@ -185,6 +355,43 @@ function getCRWithDifference(index, difference){
     }
     return CRarray[index+difference];
 
+}
+
+
+
+function calcConstModifier(){
+    //10 == avge, every 2 up = +1, every 2 down = -1
+    let constitution = document.getElementById("constitution").value;
+    constmodifier = Math.floor((constitution/2) - 5)
+    //log it
+    console.log("constitution modifier is: "+constmodifier)
+    return constmodifier
+}
+
+
+function lookupIndexByCR(cr){
+    var i = 0;
+    for(i=0; i<CRarray.length; i++){
+        if(cr == CRarray[i]){
+            return i;
+        }
+    }
+    //else we didn't get anything
+    console.log("Failed to lookup index of given CR")
+    return -1;
+}
+
+
+
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                                Interactive Functions                                 //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
+
+
+function activateCalcAvgCR(){
+    calcAvgCR();
 }
 
 function healthchange(){
@@ -210,107 +417,13 @@ function healthchange(){
     return;
 }
 
-function calcConstModifier(){
-    //10 == avge, every 2 up = +1, every 2 down = -1
-    let constitution = document.getElementById("constitution").value;
-    constmodifier = Math.floor((constitution/2) - 5)
-    //log it
-    console.log("constitution modifier is: "+constmodifier)
-    return constmodifier
-}
 
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                                 Adjust CR Functions                                  //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
 
-function lookupIndexByCR(cr){
-    var i = 0;
-    for(i=0; i<CRarray.length; i++){
-        if(cr == CRarray[i]){
-            return i;
-        }
-    }
-    //else we didn't get anything
-    console.log("Failed to lookup index of given CR")
-    return -1;
-}
-
-function calcAvgCR(){
-    //get defensive cr
-    let defCR = calcDefensiveCR();
-    if(defCR >= 0 && defCR < 30){
-        var defCRstr = defCR;
-        if(defCR == 0.125){
-            defCRstr = "1/8"
-        }
-        else if(defCR == 0.25){
-            defCRstr = "1/4"
-        }
-        else if(defCR == 0.5){
-            defCRstr = "1/2"
-        }
-        document.getElementById("defCR").innerHTML = defCRstr;
-        document.getElementById("defenceCRAvg").value = defCRstr;
-    }
-    //if CR was out of bounds
-    else{
-        document.getElementById("errormsg").innerHTML = "ERROR: defensive cr ended up being less than 0 or greater than 30";
-        document.getElementById("defCR").innerHTML = "?";
-        document.getElementById("avgCR").innerHTML = "?";
-        document.getElementById("defenceCRAvg").value = -1;
-        document.getElementById("CRAverage").value = -1;
-    }
-    //get offensive cr
-    let offCR = calcOffensiveCR();
-    if(offCR >=0 && offCR < 30){
-        var offCRstr = offCR;
-        if(offCR == 0.125){
-            offCRstr = "1/8"
-        }
-        else if(offCR == 0.25){
-            offCRstr = "1/4"
-        }
-        else if(offCR == 0.5){
-            offCRstr = "1/2"
-        }
-        document.getElementById("offCR").innerHTML = offCRstr;
-        document.getElementById("offenceCRAvg").value = offCRstr;
-    }
-    else{
-        document.getElementById("errormsg2").innerHTML = "ERROR: offensive cr ended up being less than 0 or greater than 30";
-        document.getElementById("offCR").innerHTML = "?";
-        document.getElementById("avgCR").innerHTML = "?";
-        document.getElementById("offenceCRAvg").value = -1;
-        document.getElementById("CRAverage").value = -1;
-    }
-    
-    //get average cr
-    let defCRindex = lookupIndexByCR(defCR);
-    let offCRindex = lookupIndexByCR(offCR);
-    let avgCRindex = Math.round((defCRindex + offCRindex) / 2)
-    let avgCR = CRarray[avgCRindex];
-    var avgCRstr = avgCR;
-    if(avgCR == 0.125){
-        avgCRstr = "1/8"
-    }
-    else if(avgCR == 0.25){
-        avgCRstr = "1/4"
-    }
-    else if(avgCR == 0.5){
-        avgCRstr = "1/2"
-    }
-    document.getElementById("avgCR").innerHTML = avgCRstr;
-    document.getElementById("CRAverage").value = avgCRstr;
-    updateSliderLabel(lookupIndexByCR(avgCR));
-
-    //TODO Calculate new CR based on vulnerabilities, and stuff now that we have the average CR
-    //vulerabilities, reduce effective HP by 1/2
-
-
-}
-
-
-
-/*
- !   Adjust CR Functions
-*/
 
 function updateSliderLabel(cr){
     document.getElementById("crScale").value = cr;

@@ -10,6 +10,15 @@
     <h1 style="text-align: center;">CR Adjuster</h1>
     <p style="text-align: center;">Please input your base monsters statistics below</p>
 
+    <div class="padding10">
+      <table class="threeSpaced">
+        <tr>
+          <td>Expected Challenge Rating</td>
+          <td></td>
+          <td><td style="width: 33%;"><input type="text" id="expectedCR" name="expectedCR"></td></td>
+        </tr>
+      </table>
+    </div>
     <div class="grid-container2 padding10">
       <div id="defensiveCRDiv">
         <h3>Defensive</h3>
@@ -112,7 +121,7 @@
               <select id="saveProficiencies" name="saveProficiencies">
                 <option selected value="zeroToTwo">0-2</option>
                 <option value="threeToFour">3-4</option>
-                <option value="fiveToSix">5-6</option>
+                <option value="fiveOrMore">5+</option>
               </select>
             </td>
           </tr>
