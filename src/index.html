@@ -15,7 +15,7 @@
         <tr>
           <td>Expected Challenge Rating</td>
           <td></td>
-          <td><td style="width: 33%;"><input type="text" id="expectedCR" name="expectedCR"></td></td>
+          <td><td style="width: 33%;"><input type="text" onchange="fieldChanged()" id="expectedCR" name="expectedCR"></td></td>
         </tr>
       </table>
     </div>
@@ -27,14 +27,14 @@
             <td style="width: 33%;">Hit Points</td>
             <td style="width: 34%;"></td>
             <td style="width: 33%;">
-              <input type="hidden" id="hit-points-value" name="hit-points-value" value="-1"> 
+              <input type="hidden" onchange="fieldChanged()" id="hit-points-value" name="hit-points-value" value="-1"> 
               <span id="hit-points">???</span>
             </td>
           </tr>
           <tr>
             <td style="width: 33%;">Armour Class</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="ac" name="ac" min="1" max="50"></td>
+            <td style="width: 33%;"><input type="number" onchange="fieldChanged()" id="ac" name="ac" min="1" max="50"></td>
           </tr>
         </table>
       </div>
@@ -44,17 +44,17 @@
           <tr>
             <td style="width: 33%;">Damage Per Round</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="damagePerRound" name="damagePerRound" min="0" max="320"></td>
+            <td style="width: 33%;"><input type="number" onchange="fieldChanged()" id="damagePerRound" name="damagePerRound" min="0" max="320"></td>
           </tr>
           <tr>
             <td style="width: 33%;">Atack Bonus/Save DC</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" id="atkBonus" name="atkBonus" min="-5" max="50"></td>
+            <td style="width: 33%;"><input type="number" onchange="fieldChanged()" id="atkBonus" name="atkBonus" min="-5" max="50"></td>
           </tr>
           <tr>
             <td style="width: 33%;">Uses Saves?</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="checkbox" id="useSave" name="useSave"></td>
+            <td style="width: 33%;"><input type="checkbox" onchange="fieldChanged()" id="useSave" name="useSave"></td>
           </tr>
         </table>
       </div>
@@ -68,7 +68,7 @@
             <td style="width: 33%;">Size</td>
             <td style="width: 34%;"></td>
             <td style="width: 33%;">
-              <select onchange="healthchange()" id="size" name="size">
+              <select onchange="fieldChanged()"" id="size" name="size">
                 <option value="4">Tiny</option>
                 <option value="6">Small</option>
                 <option selected value="8">Medium</option>
@@ -81,12 +81,12 @@
           <tr>
             <td style="width: 33%;">Hit Dice</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" onchange="healthchange()" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber">d8</span></td>
+            <td style="width: 33%;"><input type="number" onchange="fieldChanged()" id="hitdice" name="hitdice" min="1" max="500"><span id="diceNumber">d8</span></td>
           </tr>
           <tr>
             <td style="width: 33%;">Constitution</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="number" onchange="healthchange()" id="constitution" name="constitution" min="1" max="30"></td>
+            <td style="width: 33%;"><input type="number" onchange="fieldChanged()" id="constitution" name="constitution" min="1" max="30"></td>
           </tr>
         </table>
       </div>
@@ -96,13 +96,13 @@
           <tr>
             <td style="width: 33%;">Vulnerabilities</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="checkbox" id="vulnerabilities" name="vulnerabilities" value="vulnerabilities"></td>
+            <td style="width: 33%;"><input type="checkbox" onchange="fieldChanged()" id="vulnerabilities" name="vulnerabilities" value="vulnerabilities"></td>
           </tr>
           <tr>
             <td style="width: 33%;">Resistances/Immunities</td>
             <td style="width: 34%;"></td>
             <td style="width: 33%;">
-              <select id="resistances" name="resistances">
+              <select id="resistances" onchange="fieldChanged()" name="resistances">
                 <option selected value="none">None</option>
                 <option value="resistances">Resistances</option>
                 <option value="immunities">Immunities</option>
@@ -112,13 +112,13 @@
           <tr>
             <td style="width: 33%;">Flies and can deal damage at range (CR 0-9 only)</td>
             <td style="width: 34%;"></td>
-            <td style="width: 33%;"><input type="checkbox" id="fliesCanDmgRange" name="fliesCanDmgRange" value="fliesCanDmgRange"></td>
+            <td style="width: 33%;"><input type="checkbox" onchange="fieldChanged()" id="fliesCanDmgRange" name="fliesCanDmgRange" value="fliesCanDmgRange"></td>
           </tr>
           <tr>
             <td style="width: 33%;">Save Proficiencies</td>
             <td style="width: 34%;"></td>
             <td style="width: 33%;">
-              <select id="saveProficiencies" name="saveProficiencies">
+              <select id="saveProficiencies" onchange="fieldChanged()" name="saveProficiencies">
                 <option selected value="zeroToTwo">0-2</option>
                 <option value="threeToFour">3-4</option>
                 <option value="fiveOrMore">5+</option>
@@ -175,8 +175,8 @@
     -->
 
     <div class="padding10">
-      <h3>Calculate Current CR</h3>
-      <button type="button" onclick="calcAvgCR()">Calculate</button>
+      <h3>Current CR Estimate</h3>
+      <!-- <button type="button" onclick="calcAvgCR()">Calculate</button> -->
       <p><span class="error" id="errormsg"></span></p>
       <p><span class="error" id="errormsg2"></span></p>
       <p>The current Defensive Challenge Rating of the monster is estimated to be: <span id="defCR">?</span></p>

@@ -350,7 +350,11 @@ function getCRString(cr){
  */
 function getCRWithDifference(index, difference){
     let newArrayPos = index+difference;
-    if(newArrayPos < 0 || newArrayPos > CRarray.length){
+    //if too low, just set CR for that is 0
+    if(newArrayPos < 0){
+        return 0;
+    }
+    else if(newArrayPos > CRarray.length){
         return -100;
     }
     return CRarray[index+difference];
@@ -389,9 +393,39 @@ function lookupIndexByCR(cr){
 //                                                                                      //
 //--------------------------------------------------------------------------------------//
 
+/**
+ * 
+ * @returns true if all fields filled, false otherwise
+ */
+function allFieldsFilled(){
+    if(document.getElementById("expectedCR").value == 0){
+        return false;
+    }
+    else if(document.getElementById("constitution").value == 0){
+        return false;
+    }
+    else if(document.getElementById("hitdice").value == 0){
+        return false;
+    }
+    else if(document.getElementById("ac").value == 0){
+        return false;
+    }
+    else if(document.getElementById("damagePerRound").value == 0){
+        return false;
+    }
+    else if(document.getElementById("atkBonus").value == 0){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
 
-function activateCalcAvgCR(){
-    calcAvgCR();
+function fieldChanged(){
+    healthchange();
+    if(allFieldsFilled()){
+        calcAvgCR();
+    }
 }
 
 function healthchange(){
