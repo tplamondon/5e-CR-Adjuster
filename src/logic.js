@@ -57,7 +57,7 @@ function calcDefensiveCR(multiplier){
         hpMultiplier = 0.5;
     }
     var inputHP = document.getElementById("hit-points-value").value; 
-    let ac = parseInt(document.getElementById("ac").value) + parseInt(getSaveThrowACBonus()); 
+    let ac = parseInt(document.getElementById("ac").value) + parseInt(getSaveThrowACBonus()) + parseInt(getFlyACBonus()); 
     //display error
     if(inputHP == "???" || inputHP < 1){
         document.getElementById("errormsg").innerHTML = "ERROR: monster has valid no HP set"; 
@@ -263,6 +263,26 @@ function calcAvgCR(){
 
 /**
  * 
+ * @returns AC bonus based on if it flies or not
+ */
+function getFlyACBonus(){
+    let saveAmount = document.getElementById("fliesCanDmgRange").checked;
+    var acBonus = 0;
+    if(saveAmount == true){
+        let expectedCRStr = document.getElementById("expectedCR").value;
+        //if cr string isn't in returns -1, otherwise returns index of it
+        let crIndex = CRStrarray.indexOf(expectedCRStr);
+        //get multplier for resistances/immunities based on expected CR, will be 1 if no resistances or immunities
+        let expectedCR = CRarray[crIndex];
+        if(expectedCR < 10){
+            acBonus = 2;
+        }
+    }
+    return acBonus;
+}
+
+/**
+ * 
  * @returns AC bonus based on number of save proficiencies based on DMG
  */
 function getSaveThrowACBonus(){
@@ -451,14 +471,6 @@ function healthchange(){
     return;
 }
 
-
-//--------------------------------------------------------------------------------------//
-//                                                                                      //
-//                                 Adjust CR Functions                                  //
-//                                                                                      //
-//--------------------------------------------------------------------------------------//
-
-
 function updateSliderLabel(cr){
     document.getElementById("crScale").value = cr;
     changeSliderLabel();
@@ -480,3 +492,17 @@ function changeSliderLabel(){
     }
     crScaleText.innerHTML = crStr;
 }
+
+//--------------------------------------------------------------------------------------//
+//                                                                                      //
+//                                 Adjust CR Functions                                  //
+//                                                                                      //
+//--------------------------------------------------------------------------------------//
+
+
+function adjustCR(){
+    //get value to adjust to
+    let crIndex = document.getElementById("crScale").value;
+
+}
+

@@ -179,9 +179,9 @@
       <!-- <button type="button" onclick="calcAvgCR()">Calculate</button> -->
       <p><span class="error" id="errormsg"></span></p>
       <p><span class="error" id="errormsg2"></span></p>
-      <p>The current Defensive Challenge Rating of the monster is estimated to be: <span id="defCR">?</span></p>
-      <p>The current Offensive Challenge Rating of the monster is estimated to be: <span id="offCR">?</span></p>
-      <p>The current Challenge Rating of the monster is estimated to be: <span id="avgCR">?</span></p>
+      <p>The Defensive Challenge Rating of the monster is: <span id="defCR">?</span></p>
+      <p>The Offensive Challenge Rating of the monster is: <span id="offCR">?</span></p>
+      <p>The Challenge Rating of the monster is: <span id="avgCR">?</span></p>
       <input type="hidden" id="defenceCRAvg" value="-1"> 
       <input type="hidden" id="offenceCRAvg" value="-1"> 
       <input type="hidden" id="CRAverage" value="-1"> 
@@ -194,6 +194,9 @@
       <div class="slidecontainer">
         <input type="range" oninput="changeSliderLabel()" min="0" max="33" value="0" class="slider" id="crScale">
         <p>CR: <span id="crScaleText">0</span></p>
+      </div>
+      <div>
+        <button type="button" onclick="adjustCR()">Adjust CR</button>
       </div>
     </div>
 
