@@ -494,7 +494,7 @@ function changeSliderLabel(){
     let saveAmount = document.getElementById("fliesCanDmgRange").checked;
     var acBonus = 0;
     if(saveAmount == true){
-        let expectedCRStr = cr;
+        let expectedCRStr = CR;
         //if cr string isn't in returns -1, otherwise returns index of it
         let crIndex = CRStrarray.indexOf(expectedCRStr);
         //get multplier for resistances/immunities based on expected CR, will be 1 if no resistances or immunities
@@ -523,6 +523,9 @@ function getHPAmount(hp){
 function getACAmount(ac){
     var index = 0;
     for(index=0; index<ACarray.length; index++){
+        if(index==0 && ac < ACarray[0]){
+            return 0;
+        }
         if(ac==ACarray[index]){
             return index;
         }
@@ -552,6 +555,7 @@ function getATKBonusAmount(atkBonus){
 
 function getEffectiveHP(HP, cr){
     let multiplier = getMultiplierForResistances(cr)
+    return HP*multiplier;
 }
 
 function adjustCR(){
@@ -567,22 +571,29 @@ function adjustCR(){
     let avgCRIndex = CRStrarray.indexOf(avgCRStr);
     //get scale amount
     let scaleIndex = newCRIndex - avgCRIndex;
-    //! get effective values
-    //get effective HP
-    let effectiveHP = getEffectiveHP(document.getElementById("hit-points-value").value, document.getElementById("CRAverage").value);
-    //get added AC
-    let addedAC = getSaveThrowACBonus() + getFlyACBonusVariable(avgCRStr);
-    //get effective AC
-    let effectiveAC = parseInt(addedAC) + parseInt(document.getElementById("ac").value);
+    //get new def CR
+    let newDefCRIndex = Math.min(defCRindex + scaleIndex, 30);
 
-
-    //TODO maybe not do this?
-    //get indexes of def stuff before scaling
-    var hpIndexBeforeScale = getHPAmount(document.getElementById("hit-points-value").value)
-    var acIndexBeforeScale = getACAmount(document.getElementById("ac").value)//TODO do we need this?
-    //get index of off stuff before scaling
-    var dmgIndexBeforeScale = getDMGAmount(document.getElementById("damagePerRound").value)
-    var atkBonusIndexBeforeScale = getATKBonusAmount(document.getElementById("atkBonus").value)//TODO do we need this?
+    //get effective values
+    //get AC stuff
+    //get added AC of new AC
+    let addedAC = getSaveThrowACBonus() + getFlyACBonusVariable(CRStrarray[newCRIndex]);
+    let oldAC = parseInt(document.getElementById("ac").value);
+    //get difference between what AC *should* be at said CR, and old AC
+    let diffOldAC = oldAC - ACarray[avgCRIndex];
+    //! new AC
+    let newAC = ACarray[newCRIndex] + diffOldAC;
+    let newEffectiveAC = newAC + addedAC;
+    let effectiveACDiff = newEffectiveAC - ACarray[newCRIndex];
+    //def CR adjusts by 1 for every 2 AC difference
+    let crACAdjustment = Math.floor(effectiveACDiff/2)
+    //HP dealings
+    let newHPIndex = Math.max(Math.min(defCRIndex + crACAdjustment, 30), 0);
+    let newEffectiveHP = hpArray[newHPIndex];
+    let hpMultiplier = getMultiplierForResistances(CRarray[newCRIndex])
+    //! new HP
+    let newHP = Math.round(newEffectiveHP / hpMultiplier);
+    
 
 
 }
