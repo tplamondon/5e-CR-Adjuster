@@ -558,6 +558,7 @@ function getEffectiveHP(HP, cr){
     return HP*multiplier;
 }
 
+//TODO deal with extreme values of AC and Atk Bonus messing up scaling possibly? Current validation helps
 function adjustCR(){
     //get value to adjust to
     let newCRIndex = document.getElementById("crScale").value;
