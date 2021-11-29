@@ -571,11 +571,9 @@ function adjustCR(){
     let avgCRIndex = CRStrarray.indexOf(avgCRStr);
     //get scale amount
     let scaleIndex = newCRIndex - avgCRIndex;
-    //get new def CR
-    let newDefCRIndex = Math.min(defCRindex + scaleIndex, 30);
 
-    //get effective values
-    //get AC stuff
+    //get new def CR
+    //let newDefCRIndex = Math.max(Math.min(defCRindex + scaleIndex, 30), 0);
     //get added AC of new AC
     let addedAC = getSaveThrowACBonus() + getFlyACBonusVariable(CRStrarray[newCRIndex]);
     let oldAC = parseInt(document.getElementById("ac").value);
@@ -588,13 +586,31 @@ function adjustCR(){
     //def CR adjusts by 1 for every 2 AC difference
     let crACAdjustment = Math.floor(effectiveACDiff/2)
     //HP dealings
-    let newHPIndex = Math.max(Math.min(defCRIndex + crACAdjustment, 30), 0);
+    let newHPIndex = Math.max(Math.min(newCRIndex - crACAdjustment, 30), 0);
     let newEffectiveHP = hpArray[newHPIndex];
     let hpMultiplier = getMultiplierForResistances(CRarray[newCRIndex])
     //! new HP
     let newHP = Math.round(newEffectiveHP / hpMultiplier);
     
+    //get new off CR
+    //let newOffCRIndex = Math.max(Math.min(offCRIndex + scaleIndex, 30), 0);
+    //get effective off values
+    let oldAtkBonus = parseInt(document.getElementById("atkBonus").value);
+    let diffOldAtk = oldAtkBonus - atkarray[avgCRIndex];
+    //! new attack
+    let newAtk = atkarray[newCRIndex] + diffOldAtk;
+    let effectiveAtkDiff = newAtk - atkarray[newCRIndex];
+    //off cr adjusts by 1 for every 2 atk difference
+    let crAtkAdjustment = Math.floor(effectiveAtkDiff/2);
+    //dmg dealings
+    //! new dmg
+    let newDmgIndex = Math.max(Math.min(newCRIndex - crAtkAdjustment, 30), 0);
+    let newDmg = dmgarray[newDmgIndex];
 
-
+    //!set up values
+    document.getElementById("newHP").innerHTML = newHP;
+    document.getElementById("newAC").innerHTML = newAC;
+    document.getElementById("newDmg").innerHTML = newDmg;
+    document.getElementById("newAtkBonus").innerHTML = newAtk;
 }
 
