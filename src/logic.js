@@ -602,11 +602,20 @@ function adjustCR(){
     let effectiveAtkDiff = newAtk - atkarray[newCRIndex];
     //off cr adjusts by 1 for every 2 atk difference
     let crAtkAdjustment = Math.floor(effectiveAtkDiff/2);
-    console.log("crAtkAdjustment: "+crAtkAdjustment);
     //dmg dealings
     //! new dmg
     let newDmgIndex = Math.max(Math.min(newCRIndex - crAtkAdjustment, 30), 0);
     let newDmg = dmgarray[newDmgIndex];
+
+    var builtstr = "";
+    builtstr += "oldAtkBonus: " + oldAtkBonus +"\n";
+    builtstr += "diffOldAtk: " + diffOldAtk +"\n";
+    builtstr += "newAtk: " + newAtk +"\n";
+    builtstr += "effectiveAtkDiff: " + effectiveAtkDiff +"\n";
+    builtstr += "crAtkAdjustment: " + crAtkAdjustment +"\n";
+    builtstr += "newDmgIndex: " + newDmgIndex +"\n";
+    builtstr += "newDmg: " + newDmg +"\n";
+    console.log(builtstr);
 
 //!                                      Validation                                      //    
 
