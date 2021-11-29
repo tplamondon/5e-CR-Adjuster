@@ -339,10 +339,10 @@ function getCRString(cr){
     if(cr == 0.125){
         str = "1/8"
     }
-    else if(defCR == 0.25){
+    else if(cr == 0.25){
         str = "1/4"
     }
-    else if(defCR == 0.5){
+    else if(cr == 0.5){
         str = "1/2"
     }
     return str;
@@ -403,22 +403,22 @@ function lookupIndexByCR(cr){
  * @returns true if all fields filled, false otherwise
  */
 function allFieldsFilled(){
-    if(document.getElementById("expectedCR").value == 0){
+    if(document.getElementById("expectedCR").value.length == 0){
         return false;
     }
-    else if(document.getElementById("constitution").value == 0){
+    else if(document.getElementById("constitution").value.length == 0){
         return false;
     }
-    else if(document.getElementById("hitdice").value == 0){
+    else if(document.getElementById("hitdice").value.length == 0){
         return false;
     }
-    else if(document.getElementById("ac").value == 0){
+    else if(document.getElementById("ac").value.length == 0){
         return false;
     }
-    else if(document.getElementById("damagePerRound").value == 0){
+    else if(document.getElementById("damagePerRound").value.length == 0){
         return false;
     }
-    else if(document.getElementById("atkBonus").value == 0){
+    else if(document.getElementById("atkBonus").value.length == 0){
         return false;
     }
     else{
@@ -572,7 +572,7 @@ function adjustCR(){
     //get scale amount
     let scaleIndex = newCRIndex - avgCRIndex;
 
-    //get new def CR
+    //!get new def CR
     //let newDefCRIndex = Math.max(Math.min(defCRindex + scaleIndex, 30), 0);
     //get added AC of new AC
     let addedAC = getSaveThrowACBonus() + getFlyACBonusVariable(CRStrarray[newCRIndex]);
@@ -580,7 +580,7 @@ function adjustCR(){
     //get difference between what AC *should* be at said CR, and old AC
     let diffOldAC = oldAC - ACarray[avgCRIndex];
     //! new AC
-    let newAC = ACarray[newCRIndex] + diffOldAC;
+    var newAC = ACarray[newCRIndex] + diffOldAC;
     let newEffectiveAC = newAC + addedAC;
     let effectiveACDiff = newEffectiveAC - ACarray[newCRIndex];
     //def CR adjusts by 1 for every 2 AC difference
@@ -592,20 +592,50 @@ function adjustCR(){
     //! new HP
     let newHP = Math.round(newEffectiveHP / hpMultiplier);
     
-    //get new off CR
+    //!get new off CR
     //let newOffCRIndex = Math.max(Math.min(offCRIndex + scaleIndex, 30), 0);
     //get effective off values
     let oldAtkBonus = parseInt(document.getElementById("atkBonus").value);
     let diffOldAtk = oldAtkBonus - atkarray[avgCRIndex];
     //! new attack
-    let newAtk = atkarray[newCRIndex] + diffOldAtk;
+    var newAtk = atkarray[newCRIndex] + diffOldAtk;
     let effectiveAtkDiff = newAtk - atkarray[newCRIndex];
     //off cr adjusts by 1 for every 2 atk difference
     let crAtkAdjustment = Math.floor(effectiveAtkDiff/2);
+    console.log("crAtkAdjustment: "+crAtkAdjustment);
     //dmg dealings
     //! new dmg
     let newDmgIndex = Math.max(Math.min(newCRIndex - crAtkAdjustment, 30), 0);
     let newDmg = dmgarray[newDmgIndex];
+
+//!                                      Validation                                      //    
+
+    //Validate off CR
+    let offCRDmgIndex = newDmgIndex;
+    let properAtk = atkarray[offCRDmgIndex];
+    let diffNewAtk = newAtk - properAtk;
+    let newAtkCRAdjust = Math.floor(diffNewAtk/2);
+    let newOffValidateIndex = offCRDmgIndex + newAtkCRAdjust;
+    if(newOffValidateIndex != newCRIndex){
+        let diff = newOffValidateIndex - newCRIndex;
+        newAtk -= (diff*2);
+    }
+    console.log("newCRIndex: "+newCRIndex);
+    console.log("newOffValidateIndex: "+newOffValidateIndex);
+    console.log("off CR: "+ CRStrarray[newOffValidateIndex]);
+
+    //validate def CR
+    let defCRHPIndex = newHPIndex;
+    let properAC = ACarray[defCRHPIndex];
+    let diffNewAC = newEffectiveAC - properAC;
+    let newDefCRAdjust = Math.floor(diffNewAC/2);
+    let newDefValidateIndex = defCRHPIndex + newDefCRAdjust;
+    if(newDefValidateIndex != newCRIndex){
+        let diff = newDefValidateIndex - newCRIndex;
+        newAC -= (diff*2);
+    }
+    console.log("def CR: "+ CRStrarray[newDefValidateIndex]);
+
 
     //!set up values
     document.getElementById("newHP").innerHTML = newHP;
