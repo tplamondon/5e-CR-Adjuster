@@ -624,38 +624,19 @@ function adjustCR(){
     //get new effectiveHP based on def cr and difference between it
     let newEffectiveHP = hpArray[newDefCRIndex+diffOldEffectiveHP];
     let newHPMultiplier = parseFloat(getMultiplierForResistances(CRarray[newCRIndex])) * parseFloat(getVulnerableMultiplier());
-    let newHP = parseFloat(newEffectiveHP) / parseFloat(newHPMultiplier);
+    let newHP = Math.floor(parseFloat(newEffectiveHP) / parseFloat(newHPMultiplier));
     //old ac stuff
     let effectiveACChange = diffOldEffectiveHP * -2;
     //ac bonus based on new CR value
     let newACBonus = getFlyACBonusVariable(CRStrarray[newCRIndex]);
     let newAC = ACarray[getHPAmount(newEffectiveHP)] + effectiveACChange - newACBonus;
-    //HP range
-    var minHP = 1;
-    if(getHPAmount(newHP)-1 >= 0){
-        minHP = hpArray[newDefCRIndex-1] + 1;
-    }
-    let hpRange = minHP.toString()+"-"+newHP.toString();
 
-    /*
-    console.log("oldEffectiveHP: "+oldEffectiveHP);
-    console.log("oldEffectiveHPIndex: "+oldEffectiveHPIndex);
-    console.log("newEffectiveHP: "+newEffectiveHP);
-    console.log("newHPMultiplier: "+newHPMultiplier);
-    console.log("newHP: "+newHP);
-    console.log("diffOldEffectiveHP: "+diffOldEffectiveHP);
-    console.log("effectiveACChange: "+effectiveACChange);
-    console.log("newACBonus: "+newACBonus);
-    console.log("newAC: "+newAC);
-    */
-
-
+  
     
 
 
     //!set up values
-    
-    document.getElementById("newHP").innerHTML = hpRange;
+    document.getElementById("newHP").innerHTML = newHP;
     document.getElementById("newAC").innerHTML = newAC;
     /*
     document.getElementById("newDmg").innerHTML = newDmg;
