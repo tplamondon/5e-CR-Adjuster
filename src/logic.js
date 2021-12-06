@@ -202,7 +202,7 @@ function calcAvgCR(){
     let defCR = calcDefensiveCR(multiplier);
     if(defCR >= 0 && defCR < 30){
         var defCRstr = defCR;
-        getCRString(defCR)
+        defCRstr = getCRString(defCR)
         document.getElementById("defCR").innerHTML = defCRstr;
         document.getElementById("defenceCRAvg").value = defCRstr;
     }
@@ -542,7 +542,7 @@ function getVulnerableMultiplier(){
 function getHPAmount(hp){
     var index = 0;
     for(index=0; index<hpArray.length; index++){
-        if(hp<hpArray[index]){
+        if(hp<=hpArray[index]){
             return index;
         }
     }
@@ -608,6 +608,14 @@ function adjustCR(){
     let scaleIndex = newCRIndex - avgCRIndex;
     let newDefCRIndex = defCRIndex + scaleIndex;
     let newOffCRIndex = offCRIndex + scaleIndex;
+    console.log("minScale: "+minScale);
+    console.log("maxScale: "+maxScale);
+    console.log("newCRIndex: "+newCRIndex);
+    console.log("avgCRIndex: "+avgCRIndex);
+    console.log("scaleIndex: "+scaleIndex);
+    console.log("defCRIndex: "+defCRIndex);
+    console.log("newDefCRIndex: "+newDefCRIndex);
+    
 
 
     //!def CR stuff
@@ -618,17 +626,35 @@ function adjustCR(){
     let expectedCR = CRarray[CRStrarray.indexOf(expectedCRStr)];
     let oldEffectiveHP = getEffectiveHP(oldHP, expectedCR);
     let oldHPIndex = getHPAmount(oldHP);
+    var oldMinHP = 1;
+    if(oldHPIndex>0){
+        oldMinHP = hpArray[oldHPIndex-1]
+    }
+    let oldMaxHP = hpArray[oldHPIndex];
+    //algebra
+    let scaleHP = (oldMinHP+oldMaxHP)/oldHP;
+    console.log("scaleHP: "+scaleHP);
+    
     let oldEffectiveHPIndex = getHPAmount(oldEffectiveHP);
     //positive means had more effective HP than it's CR justifies
+    let diffOldHP = oldHPIndex - defCRIndex;
     let diffOldEffectiveHP = oldEffectiveHPIndex - defCRIndex;
     //get new effectiveHP based on def cr and difference between it
-    let newEffectiveHP = hpArray[newDefCRIndex+diffOldEffectiveHP];
-    let newHPMultiplier = parseFloat(getMultiplierForResistances(CRarray[newCRIndex])) * parseFloat(getVulnerableMultiplier());
-    let newHP = Math.floor(parseFloat(newEffectiveHP) / parseFloat(newHPMultiplier));
+    let newEffectiveHPMax = hpArray[newDefCRIndex+diffOldEffectiveHP];
+    var newEffectiveHPMin = 1;
+    if(newDefCRIndex+diffOldEffectiveHP-1 > 0){
+        newEffectiveHPMin = hpArray[newDefCRIndex+diffOldEffectiveHP-1];
+    }
+    let newEffectiveHP = (newEffectiveHPMax+newEffectiveHPMin)/scaleHP;
+    let newHPMultiplier = getMultiplierForResistances(CRarray[newCRIndex]) * getVulnerableMultiplier();
+    let newHP = Math.round(newEffectiveHP / newHPMultiplier);
     //old ac stuff
-    let effectiveACChange = diffOldEffectiveHP * -2;
+    //TODO bug here with vuln or immunities concerning HP
+    let effectiveACChange = (getHPAmount(newEffectiveHP) - newDefCRIndex) * -2;
+    //let effectiveACChange = diffOldHP * -2;
     //ac bonus based on new CR value
-    let newACBonus = getFlyACBonusVariable(CRStrarray[newCRIndex]);
+    let newACBonus = getFlyACBonusVariable(CRStrarray[newCRIndex]) + getSaveThrowACBonus();
+    console.log("effectiveACChange: "+effectiveACChange);
     let newAC = ACarray[getHPAmount(newEffectiveHP)] + effectiveACChange - newACBonus;
 
   
