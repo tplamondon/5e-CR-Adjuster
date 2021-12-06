@@ -27,6 +27,8 @@ function validateArraySizes(){
     alert(msg)
 }
 
+var minScale = 0;
+var maxScale = 33;
 
 //--------------------------------------------------------------------------------------//
 //                                                                                      //
@@ -235,7 +237,7 @@ function calcAvgCR(){
     var avgCRstr = getCRString(avgCR)
     document.getElementById("avgCR").innerHTML = avgCRstr;
     document.getElementById("CRAverage").value = avgCRstr;
-    updateSliderLabel(lookupIndexByCR(avgCR));
+    updateSliderLabel(avgCRindex, defCRindex, offCRindex);
 }
 
 
@@ -456,8 +458,25 @@ function healthchange(){
     return;
 }
 
-function updateSliderLabel(cr){
-    document.getElementById("crScale").value = cr;
+function updateSliderLabel(crIndex, defCRIndex, offCRIndex){
+    ///if >0, means it's bigger
+    let diffDef = defCRIndex - crIndex;
+    let diffOff = offCRIndex - crIndex;
+    if(diffDef > 0 && diffOff <= 0){
+        maxScale = 33 - diffDef;
+        minScale = 0 - diffOff;
+    }
+    else if(diffOff > 0 && diffDef <= 0){
+        maxScale = 33 - diffOff;
+        minScale = 0 - diffDef;
+    }
+    else{
+        maxScale = 33;
+        minScale = 0;
+    }
+    document.getElementById("crScale").min = minScale;
+    document.getElementById("crScale").max = maxScale;
+    document.getElementById("crScale").value = crIndex;
     changeSliderLabel();
 }
 
@@ -504,6 +523,15 @@ function changeSliderLabel(){
         }
     }
     return acBonus;
+}
+
+function getVulnerableMultiplier(){
+    let vulnerable = document.getElementById("vulnerabilities").checked;
+    var hpMultiplier = 1;
+    if(vulnerable == true){
+        hpMultiplier = 0.5;
+    }
+    return hpMultiplier;
 }
 
 /**
@@ -554,103 +582,84 @@ function getATKBonusAmount(atkBonus){
 }
 
 function getEffectiveHP(HP, cr){
-    let multiplier = getMultiplierForResistances(cr)
-    return HP*multiplier;
+    let vulnerable = document.getElementById("vulnerabilities").checked;
+    var hpMultiplier = 1;
+    if(vulnerable == true){
+        hpMultiplier = 0.5;
+    }
+    let multiplier = parseFloat(hpMultiplier) * parseFloat(getMultiplierForResistances(cr));
+    return parseFloat(HP)*parseFloat(multiplier);
 }
 
 //TODO deal with extreme values of AC and Atk Bonus messing up scaling possibly? Current validation helps
 function adjustCR(){
+    //console.log("=====================");
     //get value to adjust to
     let newCRIndex = document.getElementById("crScale").value;
     //get the CR's as strings such as "0", "1/4", ...
     let defCRStr = document.getElementById("defenceCRAvg").value;
     let offCRStr = document.getElementById("offenceCRAvg").value;
     let avgCRStr = document.getElementById("CRAverage").value;
-    //get index of CR's
+    //get index of old CR's
     let defCRIndex = CRStrarray.indexOf(defCRStr);
     let offCRIndex = CRStrarray.indexOf(offCRStr);
     let avgCRIndex = CRStrarray.indexOf(avgCRStr);
     //get scale amount
     let scaleIndex = newCRIndex - avgCRIndex;
+    let newDefCRIndex = defCRIndex + scaleIndex;
+    let newOffCRIndex = offCRIndex + scaleIndex;
 
-    //!get new def CR
-    //let newDefCRIndex = Math.max(Math.min(defCRindex + scaleIndex, 30), 0);
-    //get added AC of new AC
-    let addedAC = getSaveThrowACBonus() + getFlyACBonusVariable(CRStrarray[newCRIndex]);
-    let oldAC = parseInt(document.getElementById("ac").value);
-    //get difference between what AC *should* be at said CR, and old AC
-    let diffOldAC = oldAC - ACarray[avgCRIndex];
-    //! new AC
-    var newAC = ACarray[newCRIndex] + diffOldAC;
-    let newEffectiveAC = newAC + addedAC;
-    let effectiveACDiff = newEffectiveAC - ACarray[newCRIndex];
-    //def CR adjusts by 1 for every 2 AC difference
-    let crACAdjustment = Math.floor(effectiveACDiff/2)
-    //HP dealings
-    let newHPIndex = Math.max(Math.min(newCRIndex - crACAdjustment, 30), 0);
-    let newEffectiveHP = hpArray[newHPIndex];
-    let hpMultiplier = getMultiplierForResistances(CRarray[newCRIndex])
-    //! new HP
-    let newHP = Math.round(newEffectiveHP / hpMultiplier);
+
+    //!def CR stuff
+    //get HP difference
+    let oldHP = document.getElementById("hit-points-value").value;
+    let expectedCRStr = document.getElementById("expectedCR").value;
+    //if cr string isn't in returns -1, otherwise returns index of it
+    let expectedCR = CRarray[CRStrarray.indexOf(expectedCRStr)];
+    let oldEffectiveHP = getEffectiveHP(oldHP, expectedCR);
+    let oldHPIndex = getHPAmount(oldHP);
+    let oldEffectiveHPIndex = getHPAmount(oldEffectiveHP);
+    //positive means had more effective HP than it's CR justifies
+    let diffOldEffectiveHP = oldEffectiveHPIndex - defCRIndex;
+    //get new effectiveHP based on def cr and difference between it
+    let newEffectiveHP = hpArray[newDefCRIndex+diffOldEffectiveHP];
+    let newHPMultiplier = parseFloat(getMultiplierForResistances(CRarray[newCRIndex])) * parseFloat(getVulnerableMultiplier());
+    let newHP = parseFloat(newEffectiveHP) / parseFloat(newHPMultiplier);
+    //old ac stuff
+    let effectiveACChange = diffOldEffectiveHP * -2;
+    //ac bonus based on new CR value
+    let newACBonus = getFlyACBonusVariable(CRStrarray[newCRIndex]);
+    let newAC = ACarray[getHPAmount(newEffectiveHP)] + effectiveACChange - newACBonus;
+    //HP range
+    var minHP = 1;
+    if(getHPAmount(newHP)-1 >= 0){
+        minHP = hpArray[newDefCRIndex-1] + 1;
+    }
+    let hpRange = minHP.toString()+"-"+newHP.toString();
+
+    /*
+    console.log("oldEffectiveHP: "+oldEffectiveHP);
+    console.log("oldEffectiveHPIndex: "+oldEffectiveHPIndex);
+    console.log("newEffectiveHP: "+newEffectiveHP);
+    console.log("newHPMultiplier: "+newHPMultiplier);
+    console.log("newHP: "+newHP);
+    console.log("diffOldEffectiveHP: "+diffOldEffectiveHP);
+    console.log("effectiveACChange: "+effectiveACChange);
+    console.log("newACBonus: "+newACBonus);
+    console.log("newAC: "+newAC);
+    */
+
+
     
-    //!get new off CR
-    //let newOffCRIndex = Math.max(Math.min(offCRIndex + scaleIndex, 30), 0);
-    //get effective off values
-    let oldAtkBonus = parseInt(document.getElementById("atkBonus").value);
-    let diffOldAtk = oldAtkBonus - atkarray[avgCRIndex];
-    //! new attack
-    var newAtk = atkarray[newCRIndex] + diffOldAtk;
-    let effectiveAtkDiff = newAtk - atkarray[newCRIndex];
-    //off cr adjusts by 1 for every 2 atk difference
-    let crAtkAdjustment = Math.floor(effectiveAtkDiff/2);
-    //dmg dealings
-    //! new dmg
-    let newDmgIndex = Math.max(Math.min(newCRIndex - crAtkAdjustment, 30), 0);
-    let newDmg = dmgarray[newDmgIndex];
-
-    var builtstr = "";
-    builtstr += "oldAtkBonus: " + oldAtkBonus +"\n";
-    builtstr += "diffOldAtk: " + diffOldAtk +"\n";
-    builtstr += "newAtk: " + newAtk +"\n";
-    builtstr += "effectiveAtkDiff: " + effectiveAtkDiff +"\n";
-    builtstr += "crAtkAdjustment: " + crAtkAdjustment +"\n";
-    builtstr += "newDmgIndex: " + newDmgIndex +"\n";
-    builtstr += "newDmg: " + newDmg +"\n";
-    console.log(builtstr);
-
-//!                                      Validation                                      //    
-
-    //Validate off CR
-    let offCRDmgIndex = newDmgIndex;
-    let properAtk = atkarray[offCRDmgIndex];
-    let diffNewAtk = newAtk - properAtk;
-    let newAtkCRAdjust = Math.floor(diffNewAtk/2);
-    let newOffValidateIndex = offCRDmgIndex + newAtkCRAdjust;
-    if(newOffValidateIndex != newCRIndex){
-        let diff = newOffValidateIndex - newCRIndex;
-        newAtk -= (diff*2);
-    }
-    console.log("newCRIndex: "+newCRIndex);
-    console.log("newOffValidateIndex: "+newOffValidateIndex);
-    console.log("off CR: "+ CRStrarray[newOffValidateIndex]);
-
-    //validate def CR
-    let defCRHPIndex = newHPIndex;
-    let properAC = ACarray[defCRHPIndex];
-    let diffNewAC = newEffectiveAC - properAC;
-    let newDefCRAdjust = Math.floor(diffNewAC/2);
-    let newDefValidateIndex = defCRHPIndex + newDefCRAdjust;
-    if(newDefValidateIndex != newCRIndex){
-        let diff = newDefValidateIndex - newCRIndex;
-        newAC -= (diff*2);
-    }
-    console.log("def CR: "+ CRStrarray[newDefValidateIndex]);
 
 
     //!set up values
-    document.getElementById("newHP").innerHTML = newHP;
+    
+    document.getElementById("newHP").innerHTML = hpRange;
     document.getElementById("newAC").innerHTML = newAC;
+    /*
     document.getElementById("newDmg").innerHTML = newDmg;
     document.getElementById("newAtkBonus").innerHTML = newAtk;
+    */
 }
 
