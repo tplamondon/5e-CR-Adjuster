@@ -626,6 +626,7 @@ function adjustCR(){
     let expectedCR = CRarray[CRStrarray.indexOf(expectedCRStr)];
     let oldEffectiveHP = getEffectiveHP(oldHP, expectedCR);
     let oldHPIndex = getHPAmount(oldHP);
+    //get scaling of HP between max and min values for CR
     var oldMinHP = 1;
     if(oldHPIndex>0){
         oldMinHP = hpArray[oldHPIndex-1]
@@ -640,6 +641,7 @@ function adjustCR(){
     let diffOldHP = oldHPIndex - defCRIndex;
     let diffOldEffectiveHP = oldEffectiveHPIndex - defCRIndex;
     //get new effectiveHP based on def cr and difference between it
+    //get scaling of HP between max and min values for CR
     let newEffectiveHPMax = hpArray[newDefCRIndex+diffOldEffectiveHP];
     var newEffectiveHPMin = 1;
     if(newDefCRIndex+diffOldEffectiveHP-1 > 0){
@@ -649,7 +651,6 @@ function adjustCR(){
     let newHPMultiplier = getMultiplierForResistances(CRarray[newCRIndex]) * getVulnerableMultiplier();
     let newHP = Math.round(newEffectiveHP / newHPMultiplier);
     //old ac stuff
-    //TODO bug here with vuln or immunities concerning HP
     let effectiveACChange = (getHPAmount(newEffectiveHP) - newDefCRIndex) * -2;
     //let effectiveACChange = diffOldHP * -2;
     //ac bonus based on new CR value
