@@ -564,7 +564,7 @@ function getACAmount(ac){
 function getDMGAmount(dmg){
     var index = 0;
     for(index=0; index<dmgarray.length; index++){
-        if(dmg<dmgarray[index]){
+        if(dmg<=dmgarray[index]){
             return index;
         }
     }
@@ -574,6 +574,9 @@ function getDMGAmount(dmg){
 function getATKBonusAmount(atkBonus){
     var index = 0;
     for(index=0; index<atkarray.length; index++){
+        if(index==0 && atkBonus < atkarray[0]){
+            return 0;
+        }
         if(atkBonus==atkarray[index]){
             return index;
         }
@@ -591,7 +594,10 @@ function getEffectiveHP(HP, cr){
     return parseFloat(HP)*parseFloat(multiplier);
 }
 
-//TODO deal with extreme values of AC and Atk Bonus messing up scaling possibly? Current validation helps
+/**
+ * Scaleles current CR to wanted CR.
+ * Uses https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range for scaling
+ */
 function adjustCR(){
     //console.log("=====================");
     //get value to adjust to
@@ -633,21 +639,22 @@ function adjustCR(){
     }
     let oldMaxHP = hpArray[oldHPIndex];
     //algebra
-    let scaleHP = (oldMinHP+oldMaxHP)/oldHP;
-    console.log("scaleHP: "+scaleHP);
-    
     let oldEffectiveHPIndex = getHPAmount(oldEffectiveHP);
+    var oldMinEffectiveHP = 1;
+    if(oldEffectiveHPIndex>0){
+        oldMinEffectiveHP = hpArray[oldEffectiveHPIndex-1]
+    }
+    let oldMaxEffectiveHP = hpArray[oldEffectiveHPIndex];
     //positive means had more effective HP than it's CR justifies
-    let diffOldHP = oldHPIndex - defCRIndex;
     let diffOldEffectiveHP = oldEffectiveHPIndex - defCRIndex;
     //get new effectiveHP based on def cr and difference between it
     //get scaling of HP between max and min values for CR
     let newEffectiveHPMax = hpArray[newDefCRIndex+diffOldEffectiveHP];
     var newEffectiveHPMin = 1;
     if(newDefCRIndex+diffOldEffectiveHP-1 > 0){
-        newEffectiveHPMin = hpArray[newDefCRIndex+diffOldEffectiveHP-1];
+        newEffectiveHPMin = hpArray[newDefCRIndex+diffOldEffectiveHP-1]+1;
     }
-    let newEffectiveHP = (newEffectiveHPMax+newEffectiveHPMin)/scaleHP;
+    let newEffectiveHP = ((oldEffectiveHP-oldMinEffectiveHP)/(oldMaxEffectiveHP-oldMinEffectiveHP))*(newEffectiveHPMax-newEffectiveHPMin)+newEffectiveHPMin;
     let newHPMultiplier = getMultiplierForResistances(CRarray[newCRIndex]) * getVulnerableMultiplier();
     let newHP = Math.round(newEffectiveHP / newHPMultiplier);
     //old ac stuff
@@ -655,19 +662,49 @@ function adjustCR(){
     //let effectiveACChange = diffOldHP * -2;
     //ac bonus based on new CR value
     let newACBonus = getFlyACBonusVariable(CRStrarray[newCRIndex]) + getSaveThrowACBonus();
-    console.log("effectiveACChange: "+effectiveACChange);
     let newAC = ACarray[getHPAmount(newEffectiveHP)] + effectiveACChange - newACBonus;
 
-  
+    //!off CR stuff
+    //get dmg difference
+    let oldDmg = document.getElementById("damagePerRound").value;
+    //if cr string isn't in returns -1, otherwise returns index of it
+    //have expectedCR = from before
+    let oldDmgIndex = getDMGAmount(oldDmg);
+    //get scaling of dmg between max and min values for CR
+    var oldMinDmg = 0;
+    if(oldDmgIndex>0){
+        oldMinDmg = dmgarray[oldDmgIndex-1]
+    }
+    let oldMaxDmg = dmgarray[oldHPIndex];
+    //algebra
+    //positive means had more effective dmg than it's CR justifies
+    let diffOldDmg = oldDmgIndex - offCRIndex;
+    //get scaling of dmg between max and min values for CR
+    let newDmgMax = dmgarray[newOffCRIndex+diffOldDmg];
+    var newDmgMin = 0;
+    if(newOffCRIndex+diffOldDmg-1 > 0){
+        newDmgMin = dmgarray[newOffCRIndex+diffOldDmg-1]+1;
+    }
+    let newDmg = Math.round(((oldDmg-oldMinDmg)/(oldMaxDmg-oldMinDmg))*(newDmgMax-newDmgMin)+newDmgMin);
+    //old atk bonus stuff
+    var newAtk = 0;
+    let effectiveAtkSaveChange = (getDMGAmount(newDmg) - newOffCRIndex) * -2;
+    if(document.getElementById("useSave").checked){
+        //save bonus based on new CR value
+        newAtk = savearray[getDMGAmount(newDmg)] + effectiveAtkSaveChange;
+    }
+    else{
+        
+        //atk bonus based on new CR value
+        newAtk = atkarray[getDMGAmount(newDmg)] + effectiveAtkSaveChange;
+    }
     
-
-
     //!set up values
     document.getElementById("newHP").innerHTML = newHP;
     document.getElementById("newAC").innerHTML = newAC;
-    /*
     document.getElementById("newDmg").innerHTML = newDmg;
     document.getElementById("newAtkBonus").innerHTML = newAtk;
-    */
+
+    return;
 }
 
