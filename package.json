@@ -14,12 +14,14 @@
   "keywords": [],
   "author": {
     "name": "tplamondon",
-    "email": "tplamondon@tutanota.de"
+    "email": "tplamond@gmail.com"
   },
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "src/5ecr.ico"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
